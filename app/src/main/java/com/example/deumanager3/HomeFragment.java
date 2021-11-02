@@ -21,10 +21,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.deumanager3.singleton.Dday;
+import com.example.deumanager3.singleton.Schedule;
 import com.example.deumanager3.singleton.User;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -60,7 +62,7 @@ public class HomeFragment extends ToolBarFragment {
     private TextView ddayText2;
     private TextView resultText2;
     private Button dateButton2;
-    private int check;
+    private int check=0;
 
     private int tYear;           //오늘 연월일 변수
     private int tMonth;
@@ -74,8 +76,6 @@ public class HomeFragment extends ToolBarFragment {
     private int dDay2 = 1;
     private String dAuthorUid;
     private String myUid = dAuthorUid;
-
-
 
     private long d;
     private long t;
@@ -154,7 +154,6 @@ public class HomeFragment extends ToolBarFragment {
         dateButton2 = view.findViewById(R.id.dateButton2);
 
         dateButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick( View v ) {
                 // TODO Auto-generated method stub
@@ -165,8 +164,6 @@ public class HomeFragment extends ToolBarFragment {
         });
 
         dateButton2.setOnClickListener(new View.OnClickListener() {
-
-
             @Override
             public void onClick( View v ) {
                 // TODO Auto-generated method stub
@@ -206,9 +203,9 @@ public class HomeFragment extends ToolBarFragment {
 
     private void updateDisplay() {
 
-        todayText.setText(String.format("%d년 %d월 %d일",tYear, tMonth+1,tDay));
+        todayText.setText(String.format("%d년 %d월 %d일",tYear, tMonth + 1,tDay));
         if(check==1) {
-            ddayText.setText(String.format("%d년 %d월 %d일",dYear, dMonth+1,dDay));
+            ddayText.setText(String.format("%d년 %d월 %d일",dYear, dMonth + 1,dDay));
 
             if(resultNumber>=0){
                 resultText.setText(String.format("D-%d", resultNumber));
@@ -219,7 +216,7 @@ public class HomeFragment extends ToolBarFragment {
             }
         }
         else if(check==2) {
-            ddayText2.setText(String.format("%d년 %d월 %d일", dYear, dMonth + 1, dDay));
+            ddayText2.setText(String.format("%d년 %d월 %d일", dYear2, dMonth2 + 1, dDay2));
 
             if (resultNumber >= 0) {
                 resultText2.setText(String.format("D-%d", resultNumber));
@@ -233,8 +230,7 @@ public class HomeFragment extends ToolBarFragment {
     private DatePickerDialog.OnDateSetListener dDateSetListener=new DatePickerDialog.OnDateSetListener() {
 
         @Override
-        public void onDateSet( DatePicker view, int year, int monthOfYear,
-                               int dayOfMonth) {
+        public void onDateSet( DatePicker view, int year, int monthOfYear, int dayOfMonth) {
            if (check == 1) {
                // TODO Auto-generated method stub
                mDatabaseRef = FirebaseDatabase.getInstance().getReference();
@@ -247,10 +243,10 @@ public class HomeFragment extends ToolBarFragment {
 
                d = dCalendar.getTimeInMillis();
                r = (d - t) / (24 * 60 * 60 * 1000);
-
+               writeNewUser(String.valueOf(r), dYear, dMonth, dDay, dAuthorUid);
                resultNumber = (int) r;
                updateDisplay();
-               writeNewUser(String.valueOf(r), dYear, dMonth, dDay, dAuthorUid);
+
            }
            else if(check == 2) {
                // TODO Auto-generated method stub
@@ -260,14 +256,14 @@ public class HomeFragment extends ToolBarFragment {
                dDay2 = dayOfMonth;
                dAuthorUid = User.getInstance().getUid();
                final Calendar dCalendar = Calendar.getInstance();
-               dCalendar.set(dYear, dMonth, dDay);
+               dCalendar.set(dYear2, dMonth2, dDay2);
 
                d = dCalendar.getTimeInMillis();
                r = (d - t) / (24 * 60 * 60 * 1000);
-
+               writeNewUser2(String.valueOf(r), dYear2, dMonth2, dDay2, dAuthorUid);
                resultNumber = (int) r;
                updateDisplay();
-               writeNewUser2(String.valueOf(r), dYear, dMonth, dDay, dAuthorUid);
+
            }
         }
         private void writeNewUser(String result, int year, int month, int day, String authorUid) {
@@ -286,9 +282,9 @@ public class HomeFragment extends ToolBarFragment {
         }
         private void writeNewUser2 (String result2,int year2, int month2, int day2, String authorUid) {
             if (check == 2) {
-                Dday dday = new Dday(result2, year2, month2, day2, authorUid);
+                Dday dday2 = new Dday(result2, year2, month2, day2, authorUid);
 
-                mDatabaseRef.child("Dday2").child(authorUid).setValue(dday)
+                mDatabaseRef.child("Dday2").child(authorUid).setValue(dday2)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
@@ -301,10 +297,6 @@ public class HomeFragment extends ToolBarFragment {
     public void setName(String name) {
         tname.setText(name);
     }
-  
-
-
-
 
 }
 

@@ -34,6 +34,7 @@ public class ScheduleModel {
                     String classDay = ds.getValue(Schedule.class).getClassDay();
                     String classTime = ds.getValue(Schedule.class).getClassTime();
                     String authorUid = ds.getValue(Schedule.class).getClassUid();
+
                     Schedule schedule = new Schedule(className, classRoom, classDay, classTime,authorUid);
                     addScheduleModel(schedule);
                 }
